@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { editImageWithNanoBanana } from '../components/services/geminiService';
 import ResultDisplay from './ResultDisplay';
 import EditControls from './EditControls';
@@ -14,6 +15,7 @@ interface ImageEditorProps {
 }
 
 const ImageEditor: React.FC<ImageEditorProps> = ({ onNavigateToVideo }) => {
+  const navigate = useNavigate();
   const [originalImage, setOriginalImage] = useState<UploadedImage | null>(null);
   const [editedImage, setEditedImage] = useState<string | null>(null);
   const [prompt, setPrompt] = useState<string>('');
@@ -100,7 +102,10 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onNavigateToVideo }) => {
           {editedImage && !isLoading && (
             <div className="action-buttons-container">
                  <button
-                    onClick={() => onNavigateToVideo(editedImage)}
+                    onClick={() => {
+                      onNavigateToVideo(editedImage);
+                      navigate('/video');
+                    }}
                     className="action-button create-video-button"
                  >
                     ✨ Create Video

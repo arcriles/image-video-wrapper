@@ -1,26 +1,27 @@
 import React from 'react';
-// No CSS import needed
-
-type View = 'image' | 'video';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
-  activeView: View;
-  setView: (view: View) => void;
   onChangeApiKey: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ activeView, setView, onChangeApiKey }) => {
+const Navbar: React.FC<NavbarProps> = ({ onChangeApiKey }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const activeView = location.pathname === '/video' ? 'video' : 'image';
+
   return (
     <nav>
       <div className="nav-container">
         <button
-          onClick={() => setView('image')}
+          onClick={() => navigate('/image')}
           className={`nav-button ${activeView === 'image' ? 'active' : 'inactive'}`}
         >
           Image Editor
         </button>
         <button
-          onClick={() => setView('video')}
+          onClick={() => navigate('/video')}
           className={`nav-button ${activeView === 'video' ? 'active' : 'inactive'}`}
         >
           Video Generator
