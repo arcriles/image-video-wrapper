@@ -8,10 +8,9 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onImageUpload }) => {
   return (
     <div className="welcome-screen">
-      <h2>Start by Uploading an Image</h2>
+      <h2>upload image</h2>
       <p>
-        Choose a photo you want to edit. Once uploaded, you'll be able to provide a text prompt to describe the changes you want to see.
-      </p>
+pilih foto dan mulai prompting :v      </p>
       <div>
         <ImageUpload onImageUpload={onImageUpload} />
       </div>

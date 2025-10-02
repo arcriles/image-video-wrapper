@@ -24,6 +24,7 @@ export async function editImageWithNanoBanana(
   mimeType: string,
   prompt: string
 ): Promise<string> {
+  // This function remains unchanged
   try {
     const aiInstance = getAiInstance();
     const response = await aiInstance.models.generateContent({
@@ -93,15 +94,18 @@ export async function generateVideoWithVeo(
   try {
     const aiInstance = getAiInstance();
     onProgress("Initializing video generation...");
+    
+    // --- FIX: Using the corrected parameters as you provided ---
     let operation = await aiInstance.models.generateVideos({
-      model: 'veo-3.0-generate-001', // --- UPDATED MODEL ---
+      model: 'veo-3.0-fast-generate-001',
       prompt: prompt,
       image: {
         imageBytes: base64ImageData,
         mimeType: mimeType,
       },
       config: {
-        numberOfVideos: 1
+        numberOfVideos: 1,
+        aspectRatio: '9:16', // Correct string value
       }
     });
 
@@ -138,8 +142,7 @@ export async function generateVideoWithVeo(
       console.error("VEO response missing download link in video object:", videoResponse.generatedVideos[0]);
       throw new Error("Video generation succeeded, but no download link was found in the video data.");
     }
-
-    // --- FIX: Re-add API key to the download URL for authorization ---
+    
     if (!apiKey) {
       throw new Error("API_KEY is not available to download the video.");
     }

@@ -41,11 +41,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onNavigateToVideo }) => {
       setError('Please upload an image and provide an editing prompt.');
       return;
     }
-
     setIsLoading(true);
     setError(null);
     setEditedImage(null);
-
     try {
       const result = await editImageWithNanoBanana(
         originalImage.base64,
@@ -69,6 +67,16 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onNavigateToVideo }) => {
     setIsLoading(false);
   }, []);
 
+  const handleDownloadImage = () => {
+      if (!editedImage) return;
+      const link = document.createElement('a');
+      link.href = editedImage;
+      link.download = 'edited-image.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  };
+
   return (
     <div className="image-editor">
       {!originalImage ? (
@@ -82,23 +90,20 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onNavigateToVideo }) => {
             onReset={handleReset}
             isLoading={isLoading}
           />
-          {error && (
-            <div className="error-message">
-              <p><span>Error:</span> {error}</p>
-            </div>
-          )}
           <ResultDisplay
             originalImage={`data:${originalImage.file.type};base64,${originalImage.base64}`}
             editedImage={editedImage}
             isLoading={isLoading}
+            onDownload={handleDownloadImage}
+            onRemove={handleReset} 
           />
           {editedImage && !isLoading && (
-            <div>
+            <div className="action-buttons-container">
                  <button
                     onClick={() => onNavigateToVideo(editedImage)}
-                    className="create-video-button"
+                    className="action-button create-video-button"
                  >
-                    ✨ Create Video From Edited Image
+                    ✨ Create Video
                 </button>
             </div>
           )}

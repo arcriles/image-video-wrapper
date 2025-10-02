@@ -12,7 +12,7 @@ const App: React.FC = () => {
 
   const handleSetView = (newView: View) => {
     if (view === 'video' && newView !== 'video') {
-      setImageForVideo(null);
+        setImageForVideo(null);
     }
     setView(newView);
   };
@@ -21,11 +21,17 @@ const App: React.FC = () => {
     setImageForVideo(imageData);
     setView('video');
   };
+  
+  const handleChangeApiKey = () => {
+      localStorage.removeItem('gemini-api-key');
+      window.location.reload();
+  };
 
   return (
     <div className="App">
       <Header />
-      <Navbar activeView={view} setView={handleSetView} />
+      {/* --- FIX: Added the missing onChangeApiKey prop --- */}
+      <Navbar activeView={view} setView={handleSetView} onChangeApiKey={handleChangeApiKey} />
       <main>
         {view === 'image' && <ImageEditor onNavigateToVideo={handleNavigateToVideo} />}
         {view === 'video' && <VideoGenerator initialImage={imageForVideo} />}

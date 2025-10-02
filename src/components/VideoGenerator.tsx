@@ -43,7 +43,7 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
     };
     reader.readAsDataURL(file);
   }, []);
-  
+
   const handleProgress = (message: string) => {
     setLoadingMessage(message);
   };
@@ -56,7 +56,6 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
     setIsLoading(true);
     setError(null);
     setVideoUrl(null);
-
     try {
       const url = await generateVideoWithVeo(
         sourceImage.base64,
@@ -79,6 +78,16 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
     setPrompt('');
     setError(null);
     setIsLoading(false);
+  };
+
+  const handleDownloadVideo = () => {
+      if (!videoUrl) return;
+      const link = document.createElement('a');
+      link.href = videoUrl;
+      link.download = 'generated-video.mp4';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
   };
 
   if (!sourceImage) {
@@ -105,18 +114,10 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
           disabled={isLoading}
         />
         <div className="buttons">
-          <button
-            onClick={handleReset}
-            disabled={isLoading}
-            className="reset"
-          >
+          <button onClick={handleReset} disabled={isLoading} className="reset">
             Use New Image
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading || !prompt.trim()}
-            className="submit"
-          >
+          <button onClick={handleSubmit} disabled={isLoading || !prompt.trim()} className="submit">
             {isLoading ? <><Spinner /> Generating...</> : 'Generate Video'}
           </button>
         </div>
@@ -128,14 +129,26 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
         )}
       <div className="video-display">
         <div className="video-container">
-          <h2>Source Image</h2>
+          <div className="image-header">
+            <h2>Source Image</h2>
+            <div className="header-buttons">
+                <button onClick={handleReset} className="remove-button">Remove</button>
+            </div>
+          </div>
           <div className="video-box">
              <img src={sourceImage.data} alt="Source for video" />
           </div>
         </div>
         <div className="arrow">→</div>
         <div className="video-container">
-          <h2>Generated Video</h2>
+          <div className="image-header">
+            <h2>Generated Video</h2>
+            <div className="header-buttons">
+                {videoUrl && !isLoading && (
+                    <button onClick={handleDownloadVideo} className="download-button">Download</button>
+                )}
+            </div>
+          </div>
           <div className="video-box">
              {isLoading ? (
                 <div className="loading">
