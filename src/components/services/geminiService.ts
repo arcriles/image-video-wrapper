@@ -20,23 +20,22 @@ function getAiInstance(): GoogleGenAI {
 }
 
 export async function editImageWithNanoBanana(
-  base64ImageData: string,
+  base64ImageData: string[],
   mimeType: string,
   prompt: string
 ): Promise<string> {
-  // This function remains unchanged
   try {
     const aiInstance = getAiInstance();
     const response = await aiInstance.models.generateContent({
       model: 'gemini-2.5-flash-image-preview',
       contents: {
         parts: [
-          {
+          ...base64ImageData.map(data => ({
             inlineData: {
-              data: base64ImageData,
-              mimeType: mimeType,
+              data,
+              mimeType,
             },
-          },
+          })),
           {
             text: prompt,
           },
@@ -94,7 +93,7 @@ export async function generateVideoWithVeo(
   try {
     const aiInstance = getAiInstance();
     onProgress("Initializing video generation...");
-    
+
     // --- FIX: Using the corrected parameters as you provided ---
     let operation = await aiInstance.models.generateVideos({
       model: 'veo-3.0-fast-generate-001',
@@ -124,7 +123,7 @@ export async function generateVideoWithVeo(
     }
 
     onProgress("Video generation complete. Fetching video data...");
-    
+
     const videoResponse = operation.response;
 
     if (!videoResponse || !videoResponse.generatedVideos || videoResponse.generatedVideos.length === 0) {
@@ -142,7 +141,7 @@ export async function generateVideoWithVeo(
       console.error("VEO response missing download link in video object:", videoResponse.generatedVideos[0]);
       throw new Error("Video generation succeeded, but no download link was found in the video data.");
     }
-    
+
     if (!apiKey) {
       throw new Error("API_KEY is not available to download the video.");
     }

@@ -2,7 +2,7 @@ import React from 'react';
 import ImageUpload from './ImageUpload';
 
 interface WelcomeScreenProps {
-  onImageUpload: (file: File) => void;
+  onImageUpload: (files: FileList) => void;
 }
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onImageUpload }) => {
