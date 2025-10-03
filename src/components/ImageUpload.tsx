@@ -1,15 +1,15 @@
 import React, { useCallback, useState } from 'react';
 
 interface ImageUploadProps {
-  onImageUpload: (file: File) => void;
+  onImageUpload: (files: FileList) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      onImageUpload(e.target.files[0]);
+    if (e.target.files) {
+      onImageUpload(e.target.files);
     }
   };
 
@@ -28,8 +28,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
       e.preventDefault();
       e.stopPropagation();
       setIsDragging(false);
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        onImageUpload(e.dataTransfer.files[0]);
+      if (e.dataTransfer.files) {
+        onImageUpload(e.dataTransfer.files);
       }
     },
     [onImageUpload]
@@ -46,6 +46,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
       <input
         type="file"
         id="file-upload"
+        multiple
         accept="image/png, image/jpeg, image/webp"
         onChange={handleFileChange}
       />
