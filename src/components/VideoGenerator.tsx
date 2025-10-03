@@ -14,6 +14,8 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
   const [loadingMessage, setLoadingMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [showTimestampInputFor, setShowTimestampInputFor] = useState<'video' | 'image' | 'all' | null>(null);
+  const [timestamp, setTimestamp] = useState('');
 
   useEffect(() => {
     if (initialImage) {
@@ -29,7 +31,9 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
     }
   }, [initialImage]);
 
-  const handleImageUpload = useCallback((file: File) => {
+  const handleImageUpload = useCallback((files: FileList) => {
+    if (files.length === 0) return;
+    const file = files[0];
     setError(null);
     setVideoUrl(null);
     const reader = new FileReader();
@@ -80,15 +84,48 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
     setIsLoading(false);
   };
 
-  const handleDownloadVideo = () => {
-      if (!videoUrl) return;
+  const executeDownload = (startTime: string) => {
+    if (!showTimestampInputFor || !startTime) return;
+
+    const downloadFile = (url: string, filename: string) => {
       const link = document.createElement('a');
-      link.href = videoUrl;
-      link.download = 'generated-video.mp4';
+      link.href = url;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    };
+
+    if (showTimestampInputFor === 'all') {
+      if (sourceImage) {
+        setTimeout(() => downloadFile(sourceImage.data, `source_image_${startTime}.png`), 0);
+      }
+      if (videoUrl) {
+        setTimeout(() => downloadFile(videoUrl, `output_video_${startTime}.mp4`), 500);
+      }
+    } else if (showTimestampInputFor === 'video' && videoUrl) {
+      downloadFile(videoUrl, `output_video_${startTime}.mp4`);
+    } else if (showTimestampInputFor === 'image' && sourceImage) {
+      downloadFile(sourceImage.data, `source_image_${startTime}.png`);
+    }
+
+    setShowTimestampInputFor(null);
+    setTimestamp('');
   };
+  
+  const TimestampInput: React.FC = () => (
+    <form className="timestamp-form active" onSubmit={(e) => { e.preventDefault(); executeDownload(timestamp); }}>
+        <input 
+            type="text" 
+            value={timestamp} 
+            onChange={(e) => setTimestamp(e.target.value)} 
+            placeholder="Enter timestamp..." 
+            autoFocus 
+        />
+        <button type="submit">Confirm</button>
+    </form>
+);
+
 
   if (!sourceImage) {
     return (
@@ -132,9 +169,11 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
           <div className="image-header">
             <h2>Source Image</h2>
             <div className="header-buttons">
+                <button onClick={() => setShowTimestampInputFor('image')} className="download-button">Download</button>
                 <button onClick={handleReset} className="remove-button">Remove</button>
             </div>
           </div>
+          {showTimestampInputFor === 'image' && <TimestampInput />}
           <div className="video-box">
              <img src={sourceImage.data} alt="Source for video" />
           </div>
@@ -145,10 +184,11 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
             <h2>Generated Video</h2>
             <div className="header-buttons">
                 {videoUrl && !isLoading && (
-                    <button onClick={handleDownloadVideo} className="download-button">Download</button>
+                    <button onClick={() => setShowTimestampInputFor('video')} className="download-button">Download</button>
                 )}
             </div>
           </div>
+          {showTimestampInputFor === 'video' && <TimestampInput />}
           <div className="video-box">
              {isLoading ? (
                 <div className="loading">
@@ -166,6 +206,14 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({ initialImage }) => {
           </div>
         </div>
       </div>
+      {videoUrl && !isLoading && (
+          <div className="action-buttons-container-vertical">
+              <button onClick={() => setShowTimestampInputFor('all')} className="action-button download-all-button">
+                Download All
+              </button>
+              {showTimestampInputFor === 'all' && <TimestampInput />}
+          </div>
+      )}
     </div>
   );
 };
